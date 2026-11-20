@@ -1,0 +1,44 @@
+# https://contributors.home-assistant.io/apps/reference/configuration/
+name: Velbus Manager
+version: "dev"
+slug: velbus_manager
+description: >-
+  Run Velbus Manager (REST API v2, WebSocket, and configuration UI). Connect
+  the bus via USB/serial or TCP in the UI. Pairs with the Velbus Home Assistant
+  integration and velbus-aio.
+url: "https://github.com/cereal2nd/hassio-velbus-manager/tree/main/velbus-manager"
+arch:
+  - aarch64
+  - amd64
+  - armv7
+  - armhf
+init: false
+startup: services
+stage: experimental
+homeassistant: "2024.1.0"
+image: "ghcr.io/cereal2nd/velbus-manager"
+ingress: true
+ingress_port: 4201
+ingress_entry: /velbus-ui/
+ingress_stream: true
+panel_icon: mdi:home-automation
+panel_title: Velbus Manager
+webui: "http://[HOST]:[PORT:4201]/velbus-ui/"
+watchdog: "http://[HOST]:[PORT:4201]/velbus/api/v2/gateways"
+map:
+  - type: data
+    read_only: false
+ports:
+  4201/tcp: null
+ports_description:
+  4201/tcp: Velbus Manager HTTP API and web UI
+options:
+  gateway_host: "172.30.32.1"
+  gateway_port: 27015
+  authentication: false
+  log_level: Information
+schema:
+  gateway_host: str
+  gateway_port: port
+  authentication: bool
+  log_level: list(Trace|Debug|Information|Warning|Error|Critical)

@@ -1,0 +1,51 @@
+#!/command/with-contenv bashio
+# shellcheck shell=bash
+# ==============================================================================
+# Start Velbus Manager
+# ==============================================================================
+
+bashio::log.info "Preparing Velbus Manager configuration..."
+
+gateway_host="$(bashio::config 'gateway_host')"
+gateway_port="$(bashio::config 'gateway_port')"
+authentication="$(bashio::config 'authentication')"
+log_level="$(bashio::config 'log_level')"
+
+mkdir -p /data/velbus
+
+jq -n \
+  --arg level "${log_level}" \
+  --arg auth "${authentication}" \
+  --arg host "${gateway_host}" \
+  --argjson port "${gateway_port}" \
+  '{
+    "Logging": {
+      "Console": {
+        "LogLevel": {
+          "Default": $level
+        }
+      }
+    },
+    "Authentication": {
+      "Enabled": ($auth | test("true")),
+      "AuthServer": {
+        "Authority": "http://supervisor/core/api"
+      }
+    },
+    "DefaultGateway": {
+      "IP": $host,
+      "Port": $port
+    }
+  }' > /data/appsettings.json
+
+bashio::log.info "TCP seed gateway (when installation is empty): ${gateway_host}:${gateway_port}"
+bashio::log.info "Starting Velbus Manager on port $(bashio::addon.port 4201)..."
+
+export ASPNETCORE_ENVIRONMENT=Production
+export MANAGER_USERDATA=/data
+export CONFIG_FILE=/data/appsettings.json
+export DOTNET_SYSTEM_GLOBALIZATION_INVARIANT=0
+export DOTNET_EnableDiagnostics=0
+
+cd /app || exit 1
+exec ./Velbus.Manager.Release

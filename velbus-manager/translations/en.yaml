@@ -1,0 +1,17 @@
+configuration:
+  gateway_host:
+    name: Gateway host (TCP seed)
+    description: >-
+      Hostname or IP for the optional first TCP gateway when the installation
+      is still empty. Prefer Bus connections in the UI for USB or additional TCP links.
+  gateway_port:
+    name: Gateway port (TCP seed)
+    description: TCP port for that optional seeded gateway (default 27015).
+  authentication:
+    name: API authentication
+    description: >-
+      Enable JWT authentication on the Velbus API. Leave disabled for the
+      Velbus Home Assistant integration.
+  log_level:
+    name: Log level
+    description: Console log verbosity for Velbus Manager.
